@@ -1,26 +1,56 @@
-import React, { FC, useMemo } from "react"
-import Select from 'react-select'
-import { useQueryParam, StringParam } from "use-query-params";
+import React, { FC, useMemo, useState, useEffect, useRef } from "react"
 
 import Header from "../components/Header"
+import Footer from "../components/Footer"
 import PostingList from "../components/JobSearch/PostingList"
 import { useAllPostings } from "../hooks/useAllPostings"
 
 const JobSearch: FC = () => {
-  const postings = useAllPostings()
+  const postings = useAllPostings();
+  const [showLocationsFilter, setShowLocationsFilter] = useState(false);
+  const [selectedLocations, setSelectedLocations] = useState([]);
 
-  const [selectedLocations, setSelectedLocations] = useQueryParam("locations", StringParam);
+  const [showDepartmentsFilter, setShowDepartmentsFilter] = useState(false);
+  const [selectedDepartaments, setSelectedDepartaments] = useState([]);
+
+  const [showSeniorityFilter, setShowSeniorityFilter] = useState(false);
+  const [selectedSeniorities, setSelectedSeniorities] = useState([]);
+  const [filteringOptionsModal, setFilteringOptionsModal] = useState(false);
+  const [hidePlaceholder, setHidePlaceholder] = useState(false);
+  const [query, setQuery] = useState('');
+
+  const [filteredPostings, setFilteredPostings] = useState(postings);
+
+  const inputRef = useRef(null);
+
+  useEffect(() => {
+    const currentFilteredPostings = [];
+
+    postings.forEach((post) => {
+      if (
+        (!query.length || post.title.toLowerCase().includes(query.toLowerCase())) &&
+        (!selectedLocations.length || selectedLocations.includes(post.location)) &&
+        (!selectedDepartaments.length || selectedDepartaments.includes(post.department)) && 
+        (!selectedSeniorities.length || selectedSeniorities.includes(post.seniority))
+      ) {
+        currentFilteredPostings.push(post)
+      } 
+    })
+    setFilteredPostings(currentFilteredPostings);
+  }, [selectedLocations, selectedDepartaments, selectedSeniorities, query])
+
+  // const [selectedLocations, setSelectedLocations] = useQueryParam("locations", StringParam);
 
   // All of this should be extracted to a Filter components
   const agregate = useMemo(() => {
     return postings && postings.reduce((acc, { location }) => {
-     if (!acc[location]){
-       acc[location] = 0
-     } 
+      if (!acc[location]){
+        acc[location] = 0
+      }
 
-     acc[location]++ 
+      acc[location]++ 
 
-     return acc
+      return acc
     }, {})
   }, [postings])
 
@@ -31,9 +61,100 @@ const JobSearch: FC = () => {
     })) : []
   }, [agregate])
 
-  const searchLabel = `We have 193 jobs in 26 locations in 29 areas of work in 7 seniority levels`
+  const departamentsAgregate = useMemo(() => {
+    return postings && postings.reduce((acc, { department }) => {
+      if (!acc[department]){
+        acc[department] = 0
+      }
+
+      acc[department]++
+
+      return acc
+    }, {})
+  }, [postings])
+
+  const departamentsOptions = useMemo(() => {
+    return departamentsAgregate ? Object.keys(departamentsAgregate).map(dept => ({
+      value: dept,
+      label: `${dept} (${departamentsAgregate[dept]})`
+    })) : []
+  }, [departamentsAgregate])
+
+  const seniorityAgregate = useMemo(() => {
+    return postings && postings.reduce((acc, { seniority }) => {
+      if (!acc[seniority]){
+        acc[seniority] = 0
+      }
+
+      acc[seniority]++
+     return acc
+    }, {})
+  }, [postings])
+
+  const seniorityOptions = useMemo(() => {
+    return seniorityAgregate ? Object.keys(seniorityAgregate).map(snr => ({
+      value: snr,
+      label: `${snr} (${seniorityAgregate[snr]})`
+    })) : []
+  }, [seniorityAgregate])
+
+  const handleSelectLocation = (value: String) => {
+    let currentLocations = selectedLocations;
+
+    if (selectedLocations.includes(value)) {
+      currentLocations = selectedLocations.filter((loc) => loc !== value);
+    } else {
+      currentLocations.push(value);
+    }
+
+    setSelectedLocations([...currentLocations])
+  }
+
+  const handleSelectDepartament = (value: String) => {
+    let currentDepartaments = selectedDepartaments;
+
+    if (selectedDepartaments.includes(value)) {
+      currentDepartaments = selectedDepartaments.filter((dpt) => dpt !== value);
+    } else {
+      currentDepartaments.push(value);
+    }
+
+    setSelectedDepartaments([...currentDepartaments])
+  }
+
+  const handleSelectSeniority= (value: String) => {
+    let currentSeniority = selectedSeniorities;
+
+    if (selectedSeniorities.includes(value)) {
+      currentSeniority = selectedSeniorities.filter((snr) => snr !== value);
+    } else {
+      currentSeniority.push(value);
+    }
+
+    setSelectedSeniorities([...currentSeniority])
+  }
+
+  const onClickSearchButton = () => alert('search-button');
+  
+  const handleClearFilters = () => {
+    setSelectedLocations([]);
+    setSelectedDepartaments([]);
+    setSelectedSeniorities([]);
+  }
+
+  const onClickPlaceholder = () => {
+    setHidePlaceholder(true);
+    inputRef.current.focus();
+  }
+
+  const onBlurSearchQuery = () => {
+    if (!query.length) {
+      setHidePlaceholder(false);
+    }
+  }
+
   return (
-    <div>
+    <div className="job-search-main">
       <Header />
       {/* Extract into Header maybe */}
       <div
@@ -45,19 +166,179 @@ const JobSearch: FC = () => {
           backgroundSize: "cover",
           minHeight: 400
         }}
-        className="w-100 flex justify-center items-center"
+        className="w-100 cover-container"
       >
-        <h1 className="text-6xl text-gray-900">Write here your next future</h1>
+        <h2 className="cover-title">
+          Explore our jobs and choose your next challenge.
+        </h2>
+        <form onSubmit={(event) => event.preventDefault()} style={{ width: '100%' }}>
+          <div className="search-query-wrapper">
+            <input
+              ref={inputRef}
+              type="text"
+              id="search-query"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onBlur={onBlurSearchQuery}
+            />
+            <button
+              className={`search-query-placeholder${hidePlaceholder || query.length ? ' hide' : ''}`}
+              type="button"
+              onClick={onClickPlaceholder}
+            >
+              Write <span>here</span> your next future...
+            </button>
+          </div>
+        </form>
       </div>
       {/* Extract into Filters */}
-      <div className="flex flex-col justify-center items-center -mt-9 text-center">
-        <span>Location:</span>
-        <div className="w-6/12">
-          <Select options={locationOptions} setValue={(value) => console.log(value)} />
+      <div className="w-100 flex flex-col justify-center items-center -mt-9 text-center">
+        <div className="flex" style={{ width: '100%' }}>
+          <div className="w-100 filters-list-container">
+            <button
+              id="search-button"
+              type="button"
+              onClick={onClickSearchButton}
+            >
+              Search Jobs
+            </button>
+            <button
+              id="filtering-options-button"
+              type="button"
+              onClick={() => setFilteringOptionsModal(!filteringOptionsModal)}
+            >
+              Filtering options
+            </button>
+            <div
+              id="filtering-options-modal"
+              className={`${filteringOptionsModal ? 'show' : ''}`}
+            >
+              <div className="modal-content">
+                <h5 className="modal-title">Filtering options</h5>
+                <div className={`search-job-filters locations-filters${
+                  showLocationsFilter ? ' show' : ''
+                }`}>
+                  <button
+                    type="button"
+                    className="show-filters-list"
+                    onClick={() => setShowLocationsFilter(!showLocationsFilter)}
+                  >
+                    Locations
+                  </button>
+                  <div
+                    id="search-locations"
+                    className="filters-list-content"
+                  >
+                    {locationOptions.map((location) => (
+                      <button
+                        className={`category-button${
+                          selectedLocations.includes(location.value)
+                            ? ' selected'
+                            : ''}`}
+                        onClick={() => handleSelectLocation(location.value)}
+                      >
+                        {location.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className={`search-job-filters areas-of-work-filters${
+                  showDepartmentsFilter ? ' show' : ''
+                }`}>
+                  <button
+                    type="button"
+                    className="show-filters-list"
+                    onClick={() => setShowDepartmentsFilter(!showDepartmentsFilter)}
+                  >
+                    Areas of work
+                  </button>
+                  <div
+                    id="search-areas-of-work"
+                    className="filters-list-content"
+                  >
+                    {departamentsOptions.map((departament) => (
+                      <button
+                        className={`category-button${
+                          selectedDepartaments.includes(departament.value)
+                            ? ' selected'
+                            : ''}`}
+                        onClick={() => handleSelectDepartament(departament.value)}
+                      >
+                        {departament.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className={`search-job-filters seniority-level-filters${
+                  showSeniorityFilter ? ' show' : ''
+                }`}>
+                  <button
+                    type="button"
+                    className="show-filters-list"
+                    onClick={() => setShowSeniorityFilter(!showSeniorityFilter)}
+                  >
+                    Seniority level
+                  </button>
+                  <div
+                    id="search-seniority-level"
+                    className="filters-list-content"
+                  >
+                    {seniorityOptions.map((seniority) => (
+                      <button
+                        className={`category-button${
+                          selectedSeniorities.includes(seniority.value)
+                            ? ' selected'
+                            : ''}`}
+                        onClick={() => handleSelectSeniority(seniority.value)}
+                      >
+                        {seniority.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <button
+                id="clear-all-filters-button"
+                type="button"
+                onClick={handleClearFilters}
+              >
+                Clear all filters
+              </button>
+              <button
+                id="apply-filters-button"
+                type="button"
+                onClick={() => setFilteringOptionsModal(!filteringOptionsModal)}
+              >
+                Apply filters
+              </button>
+            </div>
+          </div>
         </div>
-        <span className="pt-4 text-md text-black">{searchLabel}</span>
+        <p
+          id="main-count-feedback"
+          className="pt-4 text-md text-black"
+        >
+          We have
+          {' '}
+          <span className="all">{postings.length}</span>
+          {' '}
+          jobs in
+          {' '}
+          {Object.keys(agregate).length}
+          {' '}
+          locations in
+          {' '}
+          {Object.keys(departamentsAgregate).length}
+          {' '}
+          areas of work in
+          {' '}
+          {Object.keys(seniorityAgregate).length}
+          {' '}
+          seniority levels
+        </p>
       </div>
-      {postings?.length && <PostingList postings={postings} />}
+      {postings?.length ? <PostingList postings={filteredPostings} /> : null}
+      <Footer />
     </div>
   )
 }
