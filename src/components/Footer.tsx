@@ -31,8 +31,8 @@ const Footer = ({}) => {
         </div>
         <div className="text-white" style={{minWidth: 306}}>
           <ul className="flex flex-col flex-wrap sm:flex-nowrap lg:max-h-72">
-          {MENU_ITEMS.map(({ text, link, subItems }) => (
-            <li className="text-xl mb-4">
+          {MENU_ITEMS.map(({ text, link, subItems, id }) => (
+            <li key={id} className="text-xl mb-4">
               <a
                 href={link}
               >
@@ -40,8 +40,8 @@ const Footer = ({}) => {
               </a>
               {(subItems.length > 0) && (
                 <div className="text-base">
-                  {subItems.map(({submenuText, submenuLink}) => (
-                    <a href={submenuLink} className="text-gray block mb-4 mt-4">
+                  {subItems.map(({submenuText, submenuLink, id}) => (
+                    <a href={submenuLink} className="text-gray block mb-4 mt-4" key={id}>
                       {submenuText}
                     </a>
                   ))}

@@ -28,7 +28,7 @@ const PostingList: FC<Props> = ({ postings }) => {
         <p className="showing-postings-count">
           Showing
           {' '}
-          <span>{numberOfItemsShown}</span>
+          <span>{postings.length < numberOfItemsShown ? postings.length : numberOfItemsShown}</span>
           {' '}
           out of
           {' '}

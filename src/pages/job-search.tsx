@@ -1,5 +1,7 @@
 import React, { FC, useMemo, useState, useEffect, useRef } from "react"
 
+import { useQueryParam, StringParam } from 'use-query-params';
+
 import Header from "../components/Header"
 import Footer from "../components/Footer"
 import PostingList from "../components/JobSearch/PostingList"
@@ -15,6 +17,7 @@ const JobSearch: FC = () => {
 
   const [showSeniorityFilter, setShowSeniorityFilter] = useState(false);
   const [selectedSeniorities, setSelectedSeniorities] = useState([]);
+
   const [filteringOptionsModal, setFilteringOptionsModal] = useState(false);
   const [hidePlaceholder, setHidePlaceholder] = useState(false);
   const [query, setQuery] = useState('');
@@ -23,23 +26,71 @@ const JobSearch: FC = () => {
 
   const inputRef = useRef(null);
 
+  const [selectedQueryLocation, setSelectedQueryLocation] = useQueryParam("locations", StringParam);
+  const [selectedQueryDepartaments, setSelectedQueryDepartaments] = useQueryParam("departaments", StringParam);
+  const [selectedQuerySeniority, setSelectedQuerySeniority] = useQueryParam("seniority", StringParam);
+
+  useEffect(() => {
+    if (selectedQueryLocation && selectedQueryLocation.length) {
+      setSelectedLocations(selectedQueryLocation.split(','))
+    } else {
+      setSelectedLocations([]);
+    }
+
+    if (selectedQueryDepartaments && selectedQueryDepartaments.length) {
+      setSelectedDepartaments(selectedQueryDepartaments.split(','))
+    } else {
+      setSelectedDepartaments([]);
+    }
+    
+    if (selectedQuerySeniority && selectedQuerySeniority.length) {
+      setSelectedSeniorities(selectedQuerySeniority.split(','))
+    } else {
+      setSelectedSeniorities([]);
+    }
+  }, [selectedQueryLocation, selectedQueryDepartaments, selectedQuerySeniority])
+  
   useEffect(() => {
     const currentFilteredPostings = [];
-
+    
     postings.forEach((post) => {
       if (
         (!query.length || post.title.toLowerCase().includes(query.toLowerCase())) &&
         (!selectedLocations.length || selectedLocations.includes(post.location)) &&
         (!selectedDepartaments.length || selectedDepartaments.includes(post.department)) && 
         (!selectedSeniorities.length || selectedSeniorities.includes(post.seniority))
-      ) {
-        currentFilteredPostings.push(post)
-      } 
-    })
-    setFilteredPostings(currentFilteredPostings);
-  }, [selectedLocations, selectedDepartaments, selectedSeniorities, query])
+        ) {
+          currentFilteredPostings.push(post)
+        } 
+      })
+      
+      setFilteredPostings(currentFilteredPostings);
+    }, [selectedLocations, selectedDepartaments, selectedSeniorities, query])
 
-  // const [selectedLocations, setSelectedLocations] = useQueryParam("locations", StringParam);
+  function useOutsideAlerter() {
+    useEffect(() => {
+      function handleClickOutside(event) {
+
+        if (
+          (closeOnOutsideRef.current && !closeOnOutsideRef.current.some((element) => element === event.target)) &&
+          (filterButtons.current && !filterButtons.current.some((element) => element === event.target))
+        ) {
+          setShowLocationsFilter(false);
+          setShowDepartmentsFilter(false);
+          setShowSeniorityFilter(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, [closeOnOutsideRef]);
+  }
+
+  const closeOnOutsideRef = useRef([]);
+  const filterButtons = useRef([]);
+  useOutsideAlerter();
 
   // All of this should be extracted to a Filter components
   const agregate = useMemo(() => {
@@ -98,40 +149,40 @@ const JobSearch: FC = () => {
     })) : []
   }, [seniorityAgregate])
 
-  const handleSelectLocation = (value: String) => {
-    let currentLocations = selectedLocations;
+  const handleSelectLocation = (value: string) => {
+    let selectedLocationQueries = selectedQueryLocation ? selectedQueryLocation.split(',') : [];
 
-    if (selectedLocations.includes(value)) {
-      currentLocations = selectedLocations.filter((loc) => loc !== value);
+    if (selectedLocationQueries.includes(value)) {
+      selectedLocationQueries = selectedLocationQueries.filter((loc) => loc !== value);
     } else {
-      currentLocations.push(value);
+      selectedLocationQueries.push(value);
     }
 
-    setSelectedLocations([...currentLocations])
+    setSelectedQueryLocation(selectedLocationQueries.join(','))
   }
 
-  const handleSelectDepartament = (value: String) => {
-    let currentDepartaments = selectedDepartaments;
+  const handleSelectDepartament = (value: string) => {
+    let selectedDepartamentQueries = selectedQueryDepartaments ? selectedQueryDepartaments.split(',') : [];
 
-    if (selectedDepartaments.includes(value)) {
-      currentDepartaments = selectedDepartaments.filter((dpt) => dpt !== value);
+    if (selectedDepartamentQueries.includes(value)) {
+      selectedDepartamentQueries = selectedDepartamentQueries.filter((dpt) => dpt !== value);
     } else {
-      currentDepartaments.push(value);
+      selectedDepartamentQueries.push(value);
     }
 
-    setSelectedDepartaments([...currentDepartaments])
+    setSelectedQueryDepartaments(selectedDepartamentQueries.join(','))
   }
 
-  const handleSelectSeniority= (value: String) => {
-    let currentSeniority = selectedSeniorities;
+  const handleSelectSeniority= (value: string) => {
+    let selectedSeniorityQueries = selectedQuerySeniority ? selectedQuerySeniority.split(',') : [];
 
-    if (selectedSeniorities.includes(value)) {
-      currentSeniority = selectedSeniorities.filter((snr) => snr !== value);
+    if (selectedSeniorityQueries.includes(value)) {
+      selectedSeniorityQueries = selectedSeniorityQueries.filter((snr) => snr !== value);
     } else {
-      currentSeniority.push(value);
+      selectedSeniorityQueries.push(value);
     }
 
-    setSelectedSeniorities([...currentSeniority])
+    setSelectedQuerySeniority(selectedSeniorityQueries.join(','))
   }
 
   const onClickSearchButton = () => alert('search-button');
@@ -215,10 +266,12 @@ const JobSearch: FC = () => {
             >
               <div className="modal-content">
                 <h5 className="modal-title">Filtering options</h5>
-                <div className={`search-job-filters locations-filters${
+                <div 
+                  className={`search-job-filters locations-filters${
                   showLocationsFilter ? ' show' : ''
                 }`}>
                   <button
+                    ref={(ref) => filterButtons.current.push(ref)}
                     type="button"
                     className="show-filters-list"
                     onClick={() => setShowLocationsFilter(!showLocationsFilter)}
@@ -226,9 +279,10 @@ const JobSearch: FC = () => {
                     Locations
                   </button>
                   <div
+                    ref={(ref) => closeOnOutsideRef.current.push(ref)}
                     id="search-locations"
                     className="filters-list-content"
-                  >
+                    >
                     {locationOptions.map((location) => (
                       <button
                         className={`category-button${
@@ -236,6 +290,7 @@ const JobSearch: FC = () => {
                             ? ' selected'
                             : ''}`}
                         onClick={() => handleSelectLocation(location.value)}
+                        key={location.label}
                       >
                         {location.label}
                       </button>
@@ -246,6 +301,7 @@ const JobSearch: FC = () => {
                   showDepartmentsFilter ? ' show' : ''
                 }`}>
                   <button
+                    ref={(ref) => filterButtons.current.push(ref)}
                     type="button"
                     className="show-filters-list"
                     onClick={() => setShowDepartmentsFilter(!showDepartmentsFilter)}
@@ -255,6 +311,7 @@ const JobSearch: FC = () => {
                   <div
                     id="search-areas-of-work"
                     className="filters-list-content"
+                    ref={(ref) => closeOnOutsideRef.current.push(ref)}
                   >
                     {departamentsOptions.map((departament) => (
                       <button
@@ -263,6 +320,7 @@ const JobSearch: FC = () => {
                             ? ' selected'
                             : ''}`}
                         onClick={() => handleSelectDepartament(departament.value)}
+                        key={departament.label}
                       >
                         {departament.label}
                       </button>
@@ -273,6 +331,7 @@ const JobSearch: FC = () => {
                   showSeniorityFilter ? ' show' : ''
                 }`}>
                   <button
+                    ref={(ref) => filterButtons.current.push(ref)}
                     type="button"
                     className="show-filters-list"
                     onClick={() => setShowSeniorityFilter(!showSeniorityFilter)}
@@ -282,6 +341,7 @@ const JobSearch: FC = () => {
                   <div
                     id="search-seniority-level"
                     className="filters-list-content"
+                    ref={(ref) => closeOnOutsideRef.current.push(ref)}
                   >
                     {seniorityOptions.map((seniority) => (
                       <button
@@ -290,6 +350,7 @@ const JobSearch: FC = () => {
                             ? ' selected'
                             : ''}`}
                         onClick={() => handleSelectSeniority(seniority.value)}
+                        key={seniority.label}
                       >
                         {seniority.label}
                       </button>
