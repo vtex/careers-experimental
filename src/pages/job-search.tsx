@@ -92,62 +92,152 @@ const JobSearch: FC = () => {
   const filterButtons = useRef([]);
   useOutsideAlerter();
 
-  // All of this should be extracted to a Filter components
-  const agregate = useMemo(() => {
-    return postings && postings.reduce((acc, { location }) => {
+  const initialLocationAgregate = useMemo(() => {
+    const agregateLocationRaw = postings && postings.reduce((acc, { location }) => {
+      if (!acc[location]){
+        acc[location] = 0
+      }
+      return acc
+    }, {})
+
+    return agregateLocationRaw ? Object.keys(agregateLocationRaw).map(loc => ({
+      value: loc,
+      label: `${loc} (${agregateLocationRaw[loc]})`,
+      count: agregateLocationRaw[loc]
+    })) : []
+  }, [postings])
+
+  const filteredLocationAgregate = useMemo(() => {
+    return filteredPostings && filteredPostings.reduce((acc, { location }) => {
       if (!acc[location]){
         acc[location] = 0
       }
 
-      acc[location]++ 
-
+      acc[location]++
       return acc
     }, {})
-  }, [postings])
+  }, [filteredPostings])
 
   const locationOptions = useMemo(() => {
-    return agregate ? Object.keys(agregate).map(loc => ({
+    const filteredCurrentAgregate = filteredLocationAgregate ? Object.keys(filteredLocationAgregate).map(loc => ({
       value: loc,
-      label: `${loc} (${agregate[loc]})`
+      label: `${loc} (${filteredLocationAgregate[loc]})`,
+      count: filteredLocationAgregate[loc]
     })) : []
-  }, [agregate])
 
-  const departamentsAgregate = useMemo(() => {
-    return postings && postings.reduce((acc, { department }) => {
+    const currentLocationOptions = [];
+
+    if (initialLocationAgregate.length) {
+      initialLocationAgregate.forEach((initialLocation) => {
+        const loc = filteredCurrentAgregate.find((filteredLocation) => filteredLocation.value === initialLocation.value)
+        if (loc) {
+          currentLocationOptions.push(loc)
+        } else {
+          currentLocationOptions.push(initialLocation)
+        }
+      })
+    }
+
+    return currentLocationOptions
+  }, [filteredLocationAgregate])
+
+  const initialDepartamentAgregate = useMemo(() => {
+    const agregateDepartamentRaw = postings && postings.reduce((acc, { department }) => {
+      if (!acc[department]){
+        acc[department] = 0
+      }
+      return acc
+    }, {})
+
+    return agregateDepartamentRaw ? Object.keys(agregateDepartamentRaw).map(loc => ({
+      value: loc,
+      label: `${loc} (${agregateDepartamentRaw[loc]})`,
+      count: agregateDepartamentRaw[loc]
+    })) : []
+  }, [postings])
+
+  const filteredDepartamentAgregate = useMemo(() => {
+    return filteredPostings && filteredPostings.reduce((acc, { department }) => {
       if (!acc[department]){
         acc[department] = 0
       }
 
       acc[department]++
-
       return acc
     }, {})
+  }, [filteredPostings])
+
+  const departamentOptions = useMemo(() => {
+    const filteredCurrentAgregate = filteredDepartamentAgregate ? Object.keys(filteredDepartamentAgregate).map(dept => ({
+      value: dept,
+      label: `${dept} (${filteredDepartamentAgregate[dept]})`,
+      count: filteredDepartamentAgregate[dept]
+    })) : []
+
+    const currentDepartamentOptions = [];
+
+    if (initialDepartamentAgregate.length) {
+      initialDepartamentAgregate.forEach((initialDepartament) => {
+        const dept = filteredCurrentAgregate.find((filteredDept) => filteredDept.value === initialDepartament.value)
+        if (dept) {
+          currentDepartamentOptions.push(dept)
+        } else {
+          currentDepartamentOptions.push(initialDepartament)
+        }
+      })
+    }
+
+    return currentDepartamentOptions
+  }, [filteredDepartamentAgregate])
+
+  const initialSeniorityAgregate = useMemo(() => {
+    const agregateSeniorityRaw = postings && postings.reduce((acc, { seniority }) => {
+      if (!acc[seniority]){
+        acc[seniority] = 0
+      }
+      return acc
+    }, {})
+
+    return agregateSeniorityRaw ? Object.keys(agregateSeniorityRaw).map(senr => ({
+      value: senr,
+      label: `${senr} (${agregateSeniorityRaw[senr]})`,
+      count: agregateSeniorityRaw[senr]
+    })) : []
   }, [postings])
 
-  const departamentsOptions = useMemo(() => {
-    return departamentsAgregate ? Object.keys(departamentsAgregate).map(dept => ({
-      value: dept,
-      label: `${dept} (${departamentsAgregate[dept]})`
-    })) : []
-  }, [departamentsAgregate])
-
-  const seniorityAgregate = useMemo(() => {
-    return postings && postings.reduce((acc, { seniority }) => {
+  const filteredSeniorityAgregate = useMemo(() => {
+    return filteredPostings && filteredPostings.reduce((acc, { seniority }) => {
       if (!acc[seniority]){
         acc[seniority] = 0
       }
 
       acc[seniority]++
-     return acc
+      return acc
     }, {})
-  }, [postings])
+  }, [filteredPostings])
 
   const seniorityOptions = useMemo(() => {
-    return seniorityAgregate ? Object.keys(seniorityAgregate).map(snr => ({
-      value: snr,
-      label: `${snr} (${seniorityAgregate[snr]})`
+    const filteredCurrentAgregate = filteredSeniorityAgregate ? Object.keys(filteredSeniorityAgregate).map(senr => ({
+      value: senr,
+      label: `${senr} (${filteredSeniorityAgregate[senr]})`,
+      count: filteredSeniorityAgregate[senr]
     })) : []
-  }, [seniorityAgregate])
+
+    const currentSeniorityOptions = [];
+
+    if (initialSeniorityAgregate.length) {
+      initialSeniorityAgregate.forEach((initialSeniority) => {
+        const senr = filteredCurrentAgregate.find((filteredSenr) => filteredSenr.value === initialSeniority.value)
+        if (senr) {
+          currentSeniorityOptions.push(senr)
+        } else {
+          currentSeniorityOptions.push(initialSeniority)
+        }
+      })
+    }
+
+    return currentSeniorityOptions
+  }, [filteredSeniorityAgregate])
 
   const handleSelectLocation = (value: string) => {
     let selectedLocationQueries = selectedQueryLocation ? selectedQueryLocation.split(',') : [];
@@ -288,7 +378,8 @@ const JobSearch: FC = () => {
                         className={`category-button${
                           selectedLocations.includes(location.value)
                             ? ' selected'
-                            : ''}`}
+                            : ''}
+                          ${location.count === 0 ? 'disabled' : ''}`}
                         onClick={() => handleSelectLocation(location.value)}
                         key={location.label}
                       >
@@ -313,12 +404,13 @@ const JobSearch: FC = () => {
                     className="filters-list-content"
                     ref={(ref) => closeOnOutsideRef.current.push(ref)}
                   >
-                    {departamentsOptions.map((departament) => (
+                    {departamentOptions.map((departament) => (
                       <button
                         className={`category-button${
                           selectedDepartaments.includes(departament.value)
                             ? ' selected'
-                            : ''}`}
+                            : ''}
+                            ${departament.count === 0 ? 'disabled' : ''}`}
                         onClick={() => handleSelectDepartament(departament.value)}
                         key={departament.label}
                       >
@@ -348,7 +440,8 @@ const JobSearch: FC = () => {
                         className={`category-button${
                           selectedSeniorities.includes(seniority.value)
                             ? ' selected'
-                            : ''}`}
+                            : ''}
+                            ${seniority.count === 0 ? 'disabled' : ''}`}
                         onClick={() => handleSelectSeniority(seniority.value)}
                         key={seniority.label}
                       >
@@ -381,19 +474,19 @@ const JobSearch: FC = () => {
         >
           We have
           {' '}
-          <span className="all">{postings.length}</span>
+          <span className="all">{filteredPostings.length}</span>
           {' '}
           jobs in
           {' '}
-          {Object.keys(agregate).length}
+          {Object.keys(filteredLocationAgregate).length}
           {' '}
           locations in
           {' '}
-          {Object.keys(departamentsAgregate).length}
+          {Object.keys(filteredDepartamentAgregate).length}
           {' '}
           areas of work in
           {' '}
-          {Object.keys(seniorityAgregate).length}
+          {Object.keys(filteredSeniorityAgregate).length}
           {' '}
           seniority levels
         </p>

@@ -798,7 +798,6 @@ body {
   border: none;
   text-align: left;
   background: #fff;
-  opacity: 1;
   transition: opacity 300ms;
 }
 
@@ -893,6 +892,10 @@ body {
 
 .search-job-filters .category-button.selected:after {
   background: #ccced8
+}
+
+.disabled {
+  opacity: 0.3;
 }
 
 #clear-all-filters-button {
