@@ -69,18 +69,7 @@ function Seo({ description, lang, meta, title }) {
           content: metaDescription,
         },
       ].concat(meta)}
-    >
-      <link
-        rel="icon"
-        href="https://careers.vtex.com/wp-content/uploads/2020/11/cropped-Favicon-32x32.png"
-        sizes="32x32"
-      />
-      <link
-        rel="icon"
-        href="https://careers.vtex.com/wp-content/uploads/2020/11/cropped-Favicon-192x192.png"
-        sizes="192x192"
-      />
-    </Helmet>
+    />
   )
 }
 
