@@ -6,6 +6,7 @@ import Header from "../components/Header"
 import Footer from "../components/Footer"
 import PostingList from "../components/JobSearch/PostingList"
 import { useAllPostings } from "../hooks/useAllPostings"
+import Seo from "../components/seo";
 
 const JobSearch: FC = () => {
   const postings = useAllPostings();
@@ -296,8 +297,7 @@ const JobSearch: FC = () => {
 
   return (
     <div className="job-search-main">
-      <Header />
-      {/* Extract into Header maybe */}
+      <Seo title="Job Search - VTEX Careers - Create the future of Commerce" />
       <div
         style={{
           backgroundImage:
