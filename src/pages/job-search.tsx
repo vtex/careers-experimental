@@ -3,6 +3,7 @@ import React, { FC, useMemo, useState, useEffect, useRef } from "react"
 import { useQueryParam, StringParam } from 'use-query-params';
 
 import Header from "../components/Header"
+import SEO from '../components/seo'
 import Footer from "../components/Footer"
 import PostingList from "../components/JobSearch/PostingList"
 import { useAllPostings } from "../hooks/useAllPostings"
@@ -296,8 +297,8 @@ const JobSearch: FC = () => {
 
   return (
     <div className="job-search-main">
+      <SEO title="Job Search - VTEX Careers - Create the future of Commerce" />
       <Header />
-      {/* Extract into Header maybe */}
       <div
         style={{
           backgroundImage:
