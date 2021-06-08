@@ -26,16 +26,18 @@ const Header: FC = ({}) => {
       className="flex justify-between bg-white py-2 px-2 items-center md:p-0 header"
     >
       <div className="text-rebel p-3">
-        <img
-          alt=""
-          data-srcset="https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX.png 472w, https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX-300x107.png 300w"
-          data-src="https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX.png"
-          data-sizes="(max-width: 472px) 100vw, 472px"
-          src="https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX.png"
-          sizes="(max-width: 472px) 100vw, 472px"
-          srcSet="https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX.png 472w, https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX-300x107.png 300w"
-          style={{maxWidth: 120}}
-        />
+        <a href="https://careers.vtex.com">
+          <img
+            alt="VTEX"
+            data-srcset="https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX.png 472w, https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX-300x107.png 300w"
+            data-src="https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX.png"
+            data-sizes="(max-width: 472px) 100vw, 472px"
+            src="https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX.png"
+            sizes="(max-width: 472px) 100vw, 472px"
+            srcSet="https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX.png 472w, https://careers.vtex.com/wp-content/uploads/2020/09/Logo_VTEX-300x107.png 300w"
+            style={{maxWidth: 120}}
+          />
+        </a>
       </div>
         {medium && (
           <div
