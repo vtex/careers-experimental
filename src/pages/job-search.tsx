@@ -297,7 +297,7 @@ const JobSearch: FC = () => {
 
   return (
     <div className="job-search-main">
-      <SEO title="Job Search - VTEX Careers - Create the future of Commerce" />
+      <SEO title="Job Search" />
       <Header />
       <div
         style={{
