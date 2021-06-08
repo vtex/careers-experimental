@@ -65,14 +65,14 @@ const Header: FC = ({}) => {
               </a>
               {(subItems.length > 0 && submenu) && (
                 <div 
-                  className="absolute bg-white p-5 min-w-max border border-lightGray shadow-md mt-11 animate-upwards md:animate-none md:static md:mt-2 md:shadow-none md:p-0"
+                className="absolute bg-white p-5 min-w-max border border-lightGray shadow-md mt-12 animate-upwards lg:pr-16 lg:pl-8 md:animate-none md:static md:mt-2 md:shadow-none md:p-0"
                   onMouseEnter={(subItems.length > 0 && !medium) && (() => setSubmenu(true))}
                   onMouseLeave={(subItems.length > 0 && !medium) && (() => setSubmenu(false))}
                 >
                   {subItems.map(({submenuText, submenuLink, id}) => (
                     <a
                       href={submenuLink}
-                      className="text-gray-900 text-base hover:text-rebel block pY-6 md:border-b md:border-lightGray md:py-2 md:text-sm md:pl-4"
+                      className="text-gray-900 text-base hover:text-rebel block pY-6 lg:pb-2 md:border-b md:border-lightGray md:py-2 md:text-sm md:pl-4"
                       key={id}
                     >
                       {submenuText}
