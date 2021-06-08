@@ -8,7 +8,7 @@ const PostingCard: FC<Props> = ({
 }) => {
   const postingLink = `https://careers.vtex.com/postings/${slug}`
   return (
-    <a href={postingLink}>
+    <a href={postingLink} className="w-full">
       <div
         style={{ borderBottom: "1px solid #ccc" }}
         className="posting-card mt-2 w-full p-6 flex flex-col border-gray-300 border-solid hover:shadow-lg cursor-pointer"
