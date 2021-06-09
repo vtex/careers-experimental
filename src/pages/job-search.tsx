@@ -276,7 +276,9 @@ const JobSearch: FC = () => {
     setSelectedQuerySeniority(selectedSeniorityQueries.join(','))
   }
 
-  const onClickSearchButton = () => alert('search-button');
+  const onClickSearchButton = () => {
+    setFilteringOptionsModal(!filteringOptionsModal);
+  }
   
   const handleClearFilters = () => {
     setSelectedLocations([]);
