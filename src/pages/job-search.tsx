@@ -15,6 +15,7 @@ const JobSearch: FC = () => {
 
   const [showDepartmentsFilter, setShowDepartmentsFilter] = useState(false);
   const [selectedDepartaments, setSelectedDepartaments] = useState([]);
+  const [selectedTeams, setSelectedTeams] = useState([]);
 
   const [showSeniorityFilter, setShowSeniorityFilter] = useState(false);
   const [selectedSeniorities, setSelectedSeniorities] = useState([]);
@@ -29,6 +30,7 @@ const JobSearch: FC = () => {
 
   const [selectedQueryLocation, setSelectedQueryLocation] = useQueryParam("locations", StringParam);
   const [selectedQueryDepartaments, setSelectedQueryDepartaments] = useQueryParam("departaments", StringParam);
+  const [selectedQueryTeams, setSelectedQueryTeams] = useQueryParam("teams", StringParam);
   const [selectedQuerySeniority, setSelectedQuerySeniority] = useQueryParam("seniority", StringParam);
 
   useEffect(() => {
@@ -43,13 +45,19 @@ const JobSearch: FC = () => {
     } else {
       setSelectedDepartaments([]);
     }
+
+    if (selectedQueryTeams && selectedQueryTeams.length) {
+      setSelectedTeams(selectedQueryTeams.split(','))
+    } else {
+      setSelectedTeams([]);
+    }
     
     if (selectedQuerySeniority && selectedQuerySeniority.length) {
       setSelectedSeniorities(selectedQuerySeniority.split(','))
     } else {
       setSelectedSeniorities([]);
     }
-  }, [selectedQueryLocation, selectedQueryDepartaments, selectedQuerySeniority])
+  }, [selectedQueryLocation, selectedQueryDepartaments, selectedQueryTeams, selectedQuerySeniority])
   
   useEffect(() => {
     const currentFilteredPostings = [];
@@ -59,6 +67,7 @@ const JobSearch: FC = () => {
         (!query.length || post.title.toLowerCase().includes(query.toLowerCase())) &&
         (!selectedLocations.length || selectedLocations.includes(post.location)) &&
         (!selectedDepartaments.length || selectedDepartaments.includes(post.department)) && 
+        (!selectedTeams.length || selectedTeams.includes(post.team)) && 
         (!selectedSeniorities.length || selectedSeniorities.includes(post.seniority))
         ) {
           currentFilteredPostings.push(post)
@@ -66,7 +75,7 @@ const JobSearch: FC = () => {
       })
       
       setFilteredPostings(currentFilteredPostings);
-    }, [selectedLocations, selectedDepartaments, selectedSeniorities, query])
+    }, [selectedLocations, selectedDepartaments, selectedSeniorities, selectedTeams, query])
 
   function useOutsideAlerter() {
     useEffect(() => {
@@ -191,6 +200,91 @@ const JobSearch: FC = () => {
     return currentDepartamentOptions
   }, [filteredDepartamentAgregate])
 
+  const initialTeamAgregate = useMemo(() => {
+    const teams = [];
+
+    initialDepartamentAgregate.forEach((initialDepartament) => {
+      const agregateTeamRaw = postings && postings.reduce((acc, { team, department }) => {
+        if (department === initialDepartament.value) {
+          if (!acc[team]){
+            acc[team] = 0
+          }
+
+        }
+  
+        return acc
+      }, {})
+
+      const agregateTeamRawObjectKeys = Object.keys(agregateTeamRaw);
+
+      if (agregateTeamRawObjectKeys && agregateTeamRawObjectKeys.length) {
+        agregateTeamRawObjectKeys.forEach((t) => {
+          teams.push({
+            value: t,
+            label: `${t} (${agregateTeamRaw[t]})`,
+            count: agregateTeamRaw[t],
+            departament: initialDepartament.value,
+          })
+        })
+      }
+    })
+
+    return teams;
+  }, [postings, initialDepartamentAgregate])
+
+  const filteredTeamAgregate = useMemo(() => {
+    const teams = [];
+
+    initialDepartamentAgregate.forEach((initialDepartament) => {
+      const agregateTeamRaw = filteredPostings && filteredPostings.reduce((acc, { team, department }) => {
+        if (department === initialDepartament.value) {
+          if (!acc[team]){
+            acc[team] = 0
+          }
+
+          acc[team]++
+        }
+  
+        return acc
+      }, {})
+
+      const agregateTeamRawObjectKeys = Object.keys(agregateTeamRaw);
+
+      if (agregateTeamRawObjectKeys && agregateTeamRawObjectKeys.length) {
+        agregateTeamRawObjectKeys.forEach((t) => {
+          teams.push({
+            value: t,
+            label: `${t} (${agregateTeamRaw[t]})`,
+            count: agregateTeamRaw[t],
+            departament: initialDepartament.value,
+          })
+        })
+      }
+    })
+
+    return teams;
+  }, [filteredPostings, initialDepartamentAgregate])
+
+  const teamsOptions = useMemo(() => {
+    const currentTeamOptions = [];
+
+    if (initialTeamAgregate.length) {
+      initialTeamAgregate.forEach((initialTeam) => {
+        const team = filteredTeamAgregate.find(
+          (filteredTeam) => filteredTeam.value === initialTeam.value &&
+            filteredTeam.departament === initialTeam.departament);
+
+        if (team) {
+          currentTeamOptions.push(team)
+        } else {
+          currentTeamOptions.push(initialTeam)
+        }
+      })
+    }
+
+    return currentTeamOptions
+  }, [filteredTeamAgregate])
+
   const initialSeniorityAgregate = useMemo(() => {
     const agregateSeniorityRaw = postings && postings.reduce((acc, { seniority }) => {
       if (!acc[seniority]){
@@ -264,6 +358,18 @@ const JobSearch: FC = () => {
     setSelectedQueryDepartaments(selectedDepartamentQueries.join(','))
   }
 
+  const handleSelectTeam = (value: string) => {
+    let selectedTeamQueries = selectedQueryTeams ? selectedQueryTeams.split(',') : [];
+
+    if (selectedTeamQueries.includes(value)) {
+      selectedTeamQueries = selectedTeamQueries.filter((tm) => tm !== value);
+    } else {
+      selectedTeamQueries.push(value);
+    }
+
+    setSelectedQueryTeams(selectedTeamQueries.join(','))
+  }
+
   const handleSelectSeniority= (value: string) => {
     let selectedSeniorityQueries = selectedQuerySeniority ? selectedQuerySeniority.split(',') : [];
 
@@ -283,6 +389,7 @@ const JobSearch: FC = () => {
   const handleClearFilters = () => {
     setSelectedLocations([]);
     setSelectedDepartaments([]);
+    setSelectedTeams([]);
     setSelectedSeniorities([]);
   }
 
@@ -382,7 +489,7 @@ const JobSearch: FC = () => {
                           selectedLocations.includes(location.value)
                             ? ' selected'
                             : ''}
-                          ${location.count === 0 ? 'disabled' : ''}`}
+                          ${location.count === 0 ? ' disabled' : ''}`}
                         onClick={() => handleSelectLocation(location.value)}
                         key={location.label}
                       >
@@ -408,17 +515,31 @@ const JobSearch: FC = () => {
                     ref={(ref) => closeOnOutsideRef.current.push(ref)}
                   >
                     {departamentOptions.map((departament) => (
-                      <button
-                        className={`category-button${
-                          selectedDepartaments.includes(departament.value)
-                            ? ' selected'
-                            : ''}
-                            ${departament.count === 0 ? 'disabled' : ''}`}
-                        onClick={() => handleSelectDepartament(departament.value)}
-                        key={departament.label}
-                      >
-                        {departament.label}
-                      </button>
+                      <div key={departament.label}>
+                        <button
+                          className={`category-button${
+                            selectedDepartaments.includes(departament.value)
+                              ? ' selected'
+                              : ''}
+                              ${departament.count === 0 ? ' disabled' : ''}`}
+                          onClick={() => handleSelectDepartament(departament.value)}
+                        >
+                          {departament.label}
+                        </button>
+                        {teamsOptions.filter(t => t.departament === departament.value).map(team => (
+                          <button
+                            className={`category-button subcategory-button${
+                              selectedTeams.includes(team.value)
+                                ? ' selected'
+                                : ''
+                            }${team.count === 0 ? ' disabled' : ''}`}
+                            onClick={() => handleSelectTeam(team.value)}
+                            key={team.label}
+                          >
+                            {team.label}
+                          </button>
+                        ))}
+                      </div>
                     ))}
                   </div>
                 </div>
