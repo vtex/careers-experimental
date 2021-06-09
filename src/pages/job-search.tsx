@@ -85,9 +85,11 @@ const JobSearch: FC = () => {
           (closeOnOutsideRef.current && !closeOnOutsideRef.current.some((element) => element === event.target)) &&
           (filterButtons.current && !filterButtons.current.some((element) => element === event.target))
         ) {
-          setShowLocationsFilter(false);
-          setShowDepartmentsFilter(false);
-          setShowSeniorityFilter(false);
+          setTimeout(() => {
+            setShowLocationsFilter(false);
+            setShowDepartmentsFilter(false);
+            setShowSeniorityFilter(false);
+          }, 200);
       }
     }
 
