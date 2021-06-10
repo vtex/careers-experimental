@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 
 const IndexPage = () => { 
   useEffect(() => {
-    window.location.replace("https://jobsearch.vtex.com/job-search");
+    window.location.replace("/job-search");
   }, [])
 
   return null
