@@ -9,7 +9,7 @@ import * as React from "react"
 import PropTypes from "prop-types"
 import { Helmet } from "react-helmet"
 import { useStaticQuery, graphql } from "gatsby"
-import Thumbnail from 'images/thumbnail.jpg'
+import Thumbnail from '../images/thumbnail.jpg'
 
 function Seo({ description, lang, meta, title }) {
   const { site } = useStaticQuery(
@@ -27,7 +27,6 @@ function Seo({ description, lang, meta, title }) {
   )
 
   const metaDescription = description || site.siteMetadata.description
-  const defaultTitle = site.siteMetadata?.title
 
   return (
     <Helmet
