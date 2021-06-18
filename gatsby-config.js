@@ -68,6 +68,7 @@ module.exports = {
       options: {
         siteUrl: `https://careers.vtex.com`,
       },
-    }
+    },
+    'gatsby-plugin-no-index'
   ],
 }
