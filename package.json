@@ -7,6 +7,7 @@
   "dependencies": {
     "@types/react-select": "^4.0.15",
     "gatsby": "^3.4.0",
+    "gatsby-plugin-canonical-urls": "^3.7.1",
     "gatsby-plugin-gatsby-cloud": "^2.4.1",
     "gatsby-plugin-image": "^1.5.0",
     "gatsby-plugin-manifest": "^3.4.0",

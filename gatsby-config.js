@@ -62,6 +62,12 @@ module.exports = {
           include: /svg/,
         }
       }
+    },
+    {
+      resolve: `gatsby-plugin-canonical-urls`,
+      options: {
+        siteUrl: `https://careers.vtex.com`,
+      },
     }
   ],
 }
