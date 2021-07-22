@@ -45,6 +45,22 @@ const JobSearch: FC = () => {
     StringParam
   )
 
+  const IGNORED_LOCATIONS = ['undefined', 'Brazil'];
+
+  const BRAZIL_LOCATIONS = [
+    'All locations',
+    'Brazil',
+    'Campina Grande',
+    'Curitiba',
+    'Florianópolis',
+    'João Pessoa',
+    'Quixadá',
+    'Recife',
+    'Rio de Janeiro',
+    'São Paulo',
+    'Teresópolis',
+  ];
+
   useEffect(() => {
     if (selectedQueryLocation && selectedQueryLocation.length) {
       setSelectedLocations(selectedQueryLocation.split(","))
@@ -84,7 +100,9 @@ const JobSearch: FC = () => {
         (!query.length ||
           post.title.toLowerCase().includes(query.toLowerCase())) &&
         (!selectedLocations.length ||
-          selectedLocations.includes(post.location)) &&
+          selectedLocations.includes(post.location) ||
+          (selectedLocations.includes('Brazil') &&
+            BRAZIL_LOCATIONS.includes(post.location))) &&
         (!selectedDepartaments.length ||
           selectedDepartaments.includes(post.department)) &&
         (!selectedTeams.length || selectedTeams.includes(post.team)) &&
@@ -181,13 +199,25 @@ const JobSearch: FC = () => {
 
     if (initialLocationAgregate.length) {
       initialLocationAgregate.forEach(initialLocation => {
-        if (initialLocation.value === 'undefined') return
+        if (IGNORED_LOCATIONS.includes(initialLocation.value)) return
+
         const loc = filteredCurrentAgregate.find(
           filteredLocation => filteredLocation.value === initialLocation.value
         )
         currentLocationOptions.push(loc ?? initialLocation)
       })
     }
+
+    const filteredBrazilPostings = filteredPostings.filter(
+      (posting: any) => BRAZIL_LOCATIONS.includes(posting.location)
+    );
+    const filteredBrazilPostingsCount = filteredBrazilPostings?.length ?? 0
+
+    currentLocationOptions.unshift({
+      value: 'Brazil',
+      label: `Brazil (${filteredBrazilPostingsCount})`,
+      count: filteredBrazilPostingsCount,
+    });
 
     return currentLocationOptions
   }, [filteredLocationAgregate])
