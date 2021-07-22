@@ -18,12 +18,11 @@ const PostingCard: FC<Props> = ({
         <p className="posting-card-title">{postingTitle}</p>
         <span className="posting-card-team">{`${team} - ${department}`}</span>
         <span className="posting-card-location">{location}</span>
-        <a
-          href={postingLink}
+        <span
           className="text-sm mt-2 underline uppercase posting-card-apply-now"
         >
           Apply Now
-        </a>
+        </span>
       </div>
     </a>
   )
