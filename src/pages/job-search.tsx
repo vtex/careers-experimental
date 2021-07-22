@@ -45,7 +45,9 @@ const JobSearch: FC = () => {
     StringParam
   )
 
-  const brazilLocations = [
+  const IGNORED_LOCATIONS = ['undefined', 'Brazil'];
+
+  const BRAZIL_LOCATIONS = [
     'All locations',
     'Brazil',
     'Campina Grande',
@@ -100,7 +102,7 @@ const JobSearch: FC = () => {
         (!selectedLocations.length ||
           selectedLocations.includes(post.location) ||
           (selectedLocations.includes('Brazil') &&
-            brazilLocations.includes(post.location))) &&
+            BRAZIL_LOCATIONS.includes(post.location))) &&
         (!selectedDepartaments.length ||
           selectedDepartaments.includes(post.department)) &&
         (!selectedTeams.length || selectedTeams.includes(post.team)) &&
@@ -197,10 +199,7 @@ const JobSearch: FC = () => {
 
     if (initialLocationAgregate.length) {
       initialLocationAgregate.forEach(initialLocation => {
-        if (
-          initialLocation.value === 'undefined' ||
-          initialLocation.value === 'Brazil'
-        ) return
+        if (IGNORED_LOCATIONS.includes(initialLocation.value)) return
 
         const loc = filteredCurrentAgregate.find(
           filteredLocation => filteredLocation.value === initialLocation.value
@@ -210,11 +209,9 @@ const JobSearch: FC = () => {
     }
 
     const filteredBrazilPostings = filteredPostings.filter(
-      (posting: any) => brazilLocations.includes(posting.location)
+      (posting: any) => BRAZIL_LOCATIONS.includes(posting.location)
     );
-    const filteredBrazilPostingsCount = filteredBrazilPostings && filteredBrazilPostings.length
-      ? filteredBrazilPostings.length
-      : 0
+    const filteredBrazilPostingsCount = filteredBrazilPostings?.length ?? 0
 
     currentLocationOptions.unshift({
       value: 'Brazil',
