@@ -63,7 +63,16 @@ const JobSearch: FC = () => {
 
   useEffect(() => {
     if (selectedQueryLocation && selectedQueryLocation.length) {
-      setSelectedLocations(selectedQueryLocation.split(","))
+      const currentSelectedLocations = selectedQueryLocation.split(",");
+
+      if (
+        currentSelectedLocations.some((cSL) => BRAZIL_LOCATIONS.includes(cSL)) &&
+        !currentSelectedLocations.includes('Brazil')
+      ) {
+        currentSelectedLocations.push('Brazil');
+      }
+
+      setSelectedLocations(currentSelectedLocations)
     } else {
       setSelectedLocations([])
     }
