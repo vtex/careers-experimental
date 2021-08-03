@@ -45,11 +45,12 @@ const JobSearch: FC = () => {
     StringParam
   )
 
-  const IGNORED_LOCATIONS = ['undefined', 'Brazil'];
+  const IGNORED_LOCATIONS = ['undefined'];
 
-  const BRAZIL_LOCATIONS = [
+  const BRAZIL_LOCATION = 'Brazil';
+
+  const LOCATIONS_FROM_BRAZIL = [
     'All locations',
-    'Brazil',
     'Campina Grande',
     'Curitiba',
     'Florianópolis',
@@ -63,7 +64,16 @@ const JobSearch: FC = () => {
 
   useEffect(() => {
     if (selectedQueryLocation && selectedQueryLocation.length) {
-      setSelectedLocations(selectedQueryLocation.split(","))
+      const currentSelectedLocations = selectedQueryLocation.split(",");
+
+      if (
+        currentSelectedLocations.some((cSL) => LOCATIONS_FROM_BRAZIL.includes(cSL)) &&
+        !currentSelectedLocations.includes(BRAZIL_LOCATION)
+      ) {
+        currentSelectedLocations.push(BRAZIL_LOCATION);
+      }
+
+      setSelectedLocations(currentSelectedLocations)
     } else {
       setSelectedLocations([])
     }
@@ -100,9 +110,7 @@ const JobSearch: FC = () => {
         (!query.length ||
           post.title.toLowerCase().includes(query.toLowerCase())) &&
         (!selectedLocations.length ||
-          selectedLocations.includes(post.location) ||
-          (selectedLocations.includes('Brazil') &&
-            BRAZIL_LOCATIONS.includes(post.location))) &&
+          selectedLocations.includes(post.location)) &&
         (!selectedDepartaments.length ||
           selectedDepartaments.includes(post.department)) &&
         (!selectedTeams.length || selectedTeams.includes(post.team)) &&
@@ -207,17 +215,6 @@ const JobSearch: FC = () => {
         currentLocationOptions.push(loc ?? initialLocation)
       })
     }
-
-    const filteredBrazilPostings = filteredPostings.filter(
-      (posting: any) => BRAZIL_LOCATIONS.includes(posting.location)
-    );
-    const filteredBrazilPostingsCount = filteredBrazilPostings?.length ?? 0
-
-    currentLocationOptions.unshift({
-      value: 'Brazil',
-      label: `Brazil (${filteredBrazilPostingsCount})`,
-      count: filteredBrazilPostingsCount,
-    });
 
     return currentLocationOptions
   }, [filteredLocationAgregate])
