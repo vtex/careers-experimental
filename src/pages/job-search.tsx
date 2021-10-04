@@ -62,6 +62,18 @@ const JobSearch: FC = () => {
     'Teresópolis',
   ];
 
+  const IGNORED_SENIORITY = ['undefined'];
+
+  const SENIORITY_ORDER = [
+    'Not Applicable',
+    'Internship',
+    'Entry level',
+    'Associate',
+    'Mid-Senior level',
+    'Director',
+    'Executive',
+  ];
+
   useEffect(() => {
     if (selectedQueryLocation && selectedQueryLocation.length) {
       const currentSelectedLocations = selectedQueryLocation.split(",");
@@ -154,6 +166,15 @@ const JobSearch: FC = () => {
         document.removeEventListener("mousedown", handleClickOutside)
       }
     }, [closeOnOutsideRef])
+  }
+
+  const reorderArrayElements = (array, from, to) => {
+    const newArray = [...array];
+
+    const item = newArray.splice(from, 1)[0];
+    newArray.splice(to, 0, item);
+
+    return newArray;
   }
 
   const closeOnOutsideRef = useRef([])
@@ -411,10 +432,12 @@ const JobSearch: FC = () => {
         }))
       : []
 
-    const currentSeniorityOptions = []
+    let currentSeniorityOptions = []
 
     if (initialSeniorityAgregate.length) {
       initialSeniorityAgregate.forEach(initialSeniority => {
+        if (IGNORED_SENIORITY.includes(initialSeniority.value)) return
+
         const senr = filteredCurrentAgregate.find(
           filteredSenr => filteredSenr.value === initialSeniority.value
         )
@@ -422,6 +445,21 @@ const JobSearch: FC = () => {
           currentSeniorityOptions.push(senr)
         } else {
           currentSeniorityOptions.push(initialSeniority)
+        }
+      })
+    }
+
+    if (currentSeniorityOptions?.length) {
+      currentSeniorityOptions.forEach((item) => {
+        const indexTo = SENIORITY_ORDER.indexOf(item?.value);
+        const indexFrom = currentSeniorityOptions.indexOf(item);
+
+        if (indexTo >= 0 && indexFrom >= 0) {
+          currentSeniorityOptions = reorderArrayElements(
+            currentSeniorityOptions,
+            indexFrom,
+            indexTo,
+          );
         }
       })
     }
