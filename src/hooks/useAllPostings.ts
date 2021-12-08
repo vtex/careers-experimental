@@ -54,7 +54,7 @@ export const useAllPostings = () => {
             categories.nodes.find(({ ancestors: { nodes } }) =>
               nodes[0]?.name?.includes(term)
             )?.name
-          const seniority = findFieldByTerm("Seniority")
+          const seniority = findFieldByTerm("Seniorities")
           const location = findFieldByTerm("Location")
           return {
             title,
