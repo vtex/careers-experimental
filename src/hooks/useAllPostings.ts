@@ -41,7 +41,7 @@ export const useAllPostings = () => {
               ({ ancestors: { nodes } }) =>
                 nodes.length > 1 &&
                 (nodes[0]?.name.includes("Department") ||
-                  nodes[5]?.name.includes("Department"))
+                  nodes[1]?.name.includes("Department"))
             )
             .map(({ ancestors: { nodes }, name }) => [nodes[1]?.name, name])[0]
 
