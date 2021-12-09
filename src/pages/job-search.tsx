@@ -245,12 +245,14 @@ const JobSearch: FC = () => {
 
       if (agregateCountryRawObjectKeys && agregateCountryRawObjectKeys.length) {
         agregateCountryRawObjectKeys.forEach(item => {
-          countries.push({
-            value: item,
-            label: `${item} (${agregateCountryRaw[item]})`,
-            count: agregateCountryRaw[item],
-            continent: initialContinent.value,
-          })
+          if (item !== 'null') {
+            countries.push({
+              value: item,
+              label: `${item} (${agregateCountryRaw[item]})`,
+              count: agregateCountryRaw[item],
+              continent: initialContinent.value,
+            });
+          }
         })
       }
     })
@@ -280,12 +282,14 @@ const JobSearch: FC = () => {
 
       if (agregateCountryRawObjectKeys && agregateCountryRawObjectKeys.length) {
         agregateCountryRawObjectKeys.forEach(item => {
-          countries.push({
-            value: item,
-            label: `${item} (${agregateCountryRaw[item]})`,
-            count: agregateCountryRaw[item],
-            continent: initialContinent.value,
-          })
+          if (item !== 'null') {
+            countries.push({
+              value: item,
+              label: `${item} (${agregateCountryRaw[item]})`,
+              count: agregateCountryRaw[item],
+              continent: initialContinent.value,
+            });
+          }
         })
       }
     });
