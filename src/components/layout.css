@@ -809,6 +809,10 @@ body {
   margin-left: 18px;
 }
 
+.search-job-filters .category-button.subsubcategory-button {
+  margin-left: 36px;
+}
+
 .search-job-filters .show-filters-list {
   font-size: 22px;
   line-height: 34px;
