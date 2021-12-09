@@ -1,102 +1,102 @@
-import React, { FC, useMemo, useState, useEffect, useRef } from "react"
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryParam, StringParam } from 'use-query-params';
 
-import { useQueryParam, StringParam } from "use-query-params"
+import Footer from '../components/Footer';
+import Header from '../components/Header';
+import PostingList from '../components/JobSearch/PostingList';
+import SEO from '../components/seo';
 
-import Header from "../components/Header"
-import SEO from "../components/seo"
-import Footer from "../components/Footer"
-import PostingList from "../components/JobSearch/PostingList"
-import { useAllPostings } from "../hooks/useAllPostings"
+import { useAllPostings } from '../hooks/useAllPostings';
 
 const JobSearch: FC = () => {
-  const postings = useAllPostings()
-  const [showLocationsFilter, setShowLocationsFilter] = useState(false)
-  const [selectedLocations, setSelectedLocations] = useState([])
+  const postings = useAllPostings();
+  const inputRef = useRef(null);
+    const closeOnOutsideRef = useRef([]);
+  const filterButtons = useRef([]);
 
-  const [showDepartmentsFilter, setShowDepartmentsFilter] = useState(false)
-  const [selectedDepartaments, setSelectedDepartaments] = useState([])
-  const [selectedTeams, setSelectedTeams] = useState([])
-
-  const [showSeniorityFilter, setShowSeniorityFilter] = useState(false)
-  const [selectedSeniorities, setSelectedSeniorities] = useState([])
-
-  const [filteringOptionsModal, setFilteringOptionsModal] = useState(false)
-  const [hidePlaceholder, setHidePlaceholder] = useState(false)
-  const [query, setQuery] = useState("")
-
-  const [filteredPostings, setFilteredPostings] = useState(postings)
-
-  const inputRef = useRef(null)
+  const [filteredPostings, setFilteredPostings] = useState(postings);
+  const [filteringOptionsModal, setFilteringOptionsModal] = useState(false);
+  const [hidePlaceholder, setHidePlaceholder] = useState(false);
+  const [query, setQuery] = useState('');
+  const [selectedCity, setSelectedCity] = useState([]);
+  const [selectedContinent, setSelectedContinent] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState([]);
+  const [selectedDepartaments, setSelectedDepartaments] = useState([]);
+  const [selectedSeniorities, setSelectedSeniorities] = useState([]);
+  const [selectedTeams, setSelectedTeams] = useState([]);
+  const [showDepartmentsFilter, setShowDepartmentsFilter] = useState(false);
+  const [showLocationsFilter, setShowLocationsFilter] = useState(false);
+  const [showSeniorityFilter, setShowSeniorityFilter] = useState(false);
 
   const [selectedQueryLocation, setSelectedQueryLocation] = useQueryParam(
-    "locations",
-    StringParam
-  )
-  const [
-    selectedQueryDepartaments,
-    setSelectedQueryDepartaments,
-  ] = useQueryParam("departaments", StringParam)
+    'locations',
+    StringParam,
+  );
+  const [selectedQueryContinent, setSelectedQueryContinent] = useQueryParam(
+    'continents',
+    StringParam,
+  );
+  const [selectedQueryCountry, setSelectedQueryCountry] = useQueryParam(
+    'countries',
+    StringParam,
+  );
+  const [selectedQueryCity, setSelectedQueryCity] = useQueryParam(
+    'cities',
+    StringParam,
+  );
+  const [selectedQueryDepartaments, setSelectedQueryDepartaments] = useQueryParam(
+    'departaments',
+    StringParam,
+  );
   const [selectedQueryTeams, setSelectedQueryTeams] = useQueryParam(
-    "teams",
-    StringParam
-  )
+    'teams',
+    StringParam,
+  );
   const [selectedQuerySeniority, setSelectedQuerySeniority] = useQueryParam(
-    "seniority",
-    StringParam
-  )
-
-  const IGNORED_LOCATIONS = ['undefined'];
-
-  const BRAZIL_LOCATION = 'Brazil';
-
-  const LOCATIONS_FROM_BRAZIL = [
-    'All locations',
-    'Campina Grande',
-    'Curitiba',
-    'Florianópolis',
-    'João Pessoa',
-    'Quixadá',
-    'Recife',
-    'Rio de Janeiro',
-    'São Paulo',
-    'Teresópolis',
-  ];
+    'seniority',
+    StringParam,
+  );
 
   useEffect(() => {
-    if (selectedQueryLocation && selectedQueryLocation.length) {
-      const currentSelectedLocations = selectedQueryLocation.split(",");
-
-      if (
-        currentSelectedLocations.some((cSL) => LOCATIONS_FROM_BRAZIL.includes(cSL)) &&
-        !currentSelectedLocations.includes(BRAZIL_LOCATION)
-      ) {
-        currentSelectedLocations.push(BRAZIL_LOCATION);
-      }
-
-      setSelectedLocations(currentSelectedLocations)
+    if (selectedQueryContinent && selectedQueryContinent.length) {
+      setSelectedContinent(selectedQueryContinent.split(','));
     } else {
-      setSelectedLocations([])
+      setSelectedContinent([])
+    }
+
+    if (selectedQueryCountry && selectedQueryCountry.length) {
+      setSelectedCountry(selectedQueryCountry.split(','));
+    } else {
+      setSelectedCountry([]);
+    }
+
+    if (selectedQueryCity && selectedQueryCity.length) {
+      setSelectedCity(selectedQueryCity.split(','));
+    } else {
+      setSelectedCity([]);
     }
 
     if (selectedQueryDepartaments && selectedQueryDepartaments.length) {
-      setSelectedDepartaments(selectedQueryDepartaments.split(","))
+      setSelectedDepartaments(selectedQueryDepartaments.split(','))
     } else {
       setSelectedDepartaments([])
     }
 
     if (selectedQueryTeams && selectedQueryTeams.length) {
-      setSelectedTeams(selectedQueryTeams.split(","))
+      setSelectedTeams(selectedQueryTeams.split(','))
     } else {
       setSelectedTeams([])
     }
 
     if (selectedQuerySeniority && selectedQuerySeniority.length) {
-      setSelectedSeniorities(selectedQuerySeniority.split(","))
+      setSelectedSeniorities(selectedQuerySeniority.split(','))
     } else {
       setSelectedSeniorities([])
     }
   }, [
-    selectedQueryLocation,
+    selectedQueryContinent,
+    selectedQueryCountry,
+    selectedQueryCity,
     selectedQueryDepartaments,
     selectedQueryTeams,
     selectedQuerySeniority,
@@ -107,28 +107,35 @@ const JobSearch: FC = () => {
 
     postings.forEach(post => {
       if (
-        (!query.length ||
-          post.title.toLowerCase().includes(query.toLowerCase())) &&
-        (!selectedLocations.length ||
-          selectedLocations.includes(post.location)) &&
-        (!selectedDepartaments.length ||
-          selectedDepartaments.includes(post.department)) &&
-        (!selectedTeams.length || selectedTeams.includes(post.team)) &&
-        (!selectedSeniorities.length ||
-          selectedSeniorities.includes(post.seniority))
+        (!query.length
+          || post.title.toLowerCase().includes(query.toLowerCase())) &&
+        (!selectedContinent.length
+          || selectedContinent.includes(post.continent)) &&
+        (!selectedCountry.length
+          || selectedCountry.includes(post.country)) &&
+        (!selectedCity.length
+          || selectedCity.includes(post.city)) &&
+        (!selectedDepartaments.length
+          || selectedDepartaments.includes(post.department)) &&
+        (!selectedTeams.length
+          || selectedTeams.includes(post.team)) &&
+        (!selectedSeniorities.length
+          || selectedSeniorities.includes(post.seniority))
       ) {
-        currentFilteredPostings.push(post)
+        currentFilteredPostings.push(post);
       }
-    })
+    });
 
-    setFilteredPostings(currentFilteredPostings)
+    setFilteredPostings(currentFilteredPostings);
   }, [
-    selectedLocations,
+    query,
+    selectedCity,
+    selectedContinent,
+    selectedCountry,
     selectedDepartaments,
     selectedSeniorities,
     selectedTeams,
-    query,
-  ])
+  ]);
 
   function useOutsideAlerter() {
     useEffect(() => {
@@ -145,79 +152,268 @@ const JobSearch: FC = () => {
             setShowLocationsFilter(false)
             setShowDepartmentsFilter(false)
             setShowSeniorityFilter(false)
-          }, 200)
+          }, 200);
         }
       }
 
-      document.addEventListener("mousedown", handleClickOutside)
+      document.addEventListener('mousedown', handleClickOutside)
       return () => {
-        document.removeEventListener("mousedown", handleClickOutside)
+        document.removeEventListener('mousedown', handleClickOutside)
       }
     }, [closeOnOutsideRef])
   }
 
-  const closeOnOutsideRef = useRef([])
-  const filterButtons = useRef([])
-  useOutsideAlerter()
+  useOutsideAlerter();
 
-  const initialLocationAgregate = useMemo(() => {
-    const agregateLocationRaw =
+  const initialContinentAgregate = useMemo(() => {
+    const agregateContinentRaw =
       postings &&
-      postings.reduce((acc, { location }) => {
-        if (!acc[location]) {
-          acc[location] = 0
+      postings.reduce((acc, { continent }) => {
+        if (!acc[continent]) {
+          acc[continent] = 0
         }
         return acc
       }, {})
 
-    return agregateLocationRaw
-      ? Object.keys(agregateLocationRaw).map(loc => ({
+    return agregateContinentRaw
+      ? Object.keys(agregateContinentRaw).map(loc => ({
           value: loc,
-          label: `${loc} (${agregateLocationRaw[loc]})`,
-          count: agregateLocationRaw[loc],
+          label: `${loc} (${agregateContinentRaw[loc]})`,
+          count: agregateContinentRaw[loc],
         }))
       : []
-  }, [postings])
+  }, [postings]);
 
-  const filteredLocationAgregate = useMemo(() => {
+  const filteredContinentAgregate = useMemo(() => {
     return (
       filteredPostings &&
-      filteredPostings.reduce((acc, { location }) => {
-        if (!acc[location]) {
-          acc[location] = 0
+      filteredPostings.reduce((acc, { continent }) => {
+        if (!acc[continent]) {
+          acc[continent] = 0
         }
 
-        acc[location]++
+        acc[continent]++
         return acc
       }, {})
     )
-  }, [filteredPostings])
+  }, [filteredPostings]);
 
-  const locationOptions = useMemo(() => {
-    const filteredCurrentAgregate = filteredLocationAgregate
-      ? Object.keys(filteredLocationAgregate)
-          .map(loc => ({
-            value: loc,
-            label: `${loc} (${filteredLocationAgregate[loc]})`,
-            count: filteredLocationAgregate[loc],
-          }))
+  const continentOptions = useMemo(() => {
+    const filteredCurrentAgregate = filteredContinentAgregate
+      ? Object.keys(filteredContinentAgregate).map(cont => ({
+          value: cont,
+          label: `${cont} (${filteredContinentAgregate[cont]})`,
+          count: filteredContinentAgregate[cont],
+        }))
       : []
 
-    const currentLocationOptions = []
+    const currentContinentOptions = [];
 
-    if (initialLocationAgregate.length) {
-      initialLocationAgregate.forEach(initialLocation => {
-        if (IGNORED_LOCATIONS.includes(initialLocation.value)) return
-
-        const loc = filteredCurrentAgregate.find(
-          filteredLocation => filteredLocation.value === initialLocation.value
+    if (initialContinentAgregate.length) {
+      initialContinentAgregate.forEach(initialContinent => {
+        const cont = filteredCurrentAgregate.find(
+          filteredCont => filteredCont.value === initialContinent.value
         )
-        currentLocationOptions.push(loc ?? initialLocation)
+        if (cont) {
+          currentContinentOptions.push(cont)
+        } else {
+          currentContinentOptions.push(initialContinent)
+        }
       })
     }
 
-    return currentLocationOptions
-  }, [filteredLocationAgregate])
+    return currentContinentOptions
+  }, [filteredContinentAgregate]);
+
+  const initialCountryAgregate = useMemo(() => {
+    const countries = [];
+
+    initialContinentAgregate.forEach(initialContinent => {
+      const agregateCountryRaw =
+        postings &&
+        postings.reduce((acc, { country, continent }) => {
+          if (continent === initialContinent.value) {
+            if (!acc[country]) {
+              acc[country] = 0
+            }
+          }
+
+          return acc
+        }, {})
+
+      const agregateCountryRawObjectKeys = Object.keys(agregateCountryRaw)
+
+      if (agregateCountryRawObjectKeys && agregateCountryRawObjectKeys.length) {
+        agregateCountryRawObjectKeys.forEach(item => {
+          if (item !== 'null') {
+            countries.push({
+              value: item,
+              label: `${item} (${agregateCountryRaw[item]})`,
+              count: agregateCountryRaw[item],
+              continent: initialContinent.value,
+            });
+          }
+        })
+      }
+    })
+
+    return countries
+  }, [postings, initialContinentAgregate]);
+
+  const filteredCountryAgregate = useMemo(() => {
+    const countries = [];
+
+    initialContinentAgregate.forEach(initialContinent => {
+      const agregateCountryRaw =
+        filteredPostings &&
+        filteredPostings.reduce((acc, { country, continent }) => {
+          if (continent === initialContinent.value) {
+            if (!acc[country]) {
+              acc[country] = 0
+            }
+
+            acc[country]++
+          }
+
+          return acc
+        }, {})
+
+      const agregateCountryRawObjectKeys = Object.keys(agregateCountryRaw)
+
+      if (agregateCountryRawObjectKeys && agregateCountryRawObjectKeys.length) {
+        agregateCountryRawObjectKeys.forEach(item => {
+          if (item !== 'null') {
+            countries.push({
+              value: item,
+              label: `${item} (${agregateCountryRaw[item]})`,
+              count: agregateCountryRaw[item],
+              continent: initialContinent.value,
+            });
+          }
+        })
+      }
+    });
+
+    return countries;
+  }, [filteredPostings, initialContinentAgregate]);
+
+  const countryOptions = useMemo(() => {
+    const currentCountryOptions = [];
+
+    if (initialCountryAgregate.length) {
+      initialCountryAgregate.forEach(initialCountry => {
+        const currentCountry = filteredCountryAgregate.find(
+          filteredCountry =>
+          filteredCountry.value === initialCountry.value &&
+            filteredCountry.continent === initialCountry.continent
+        )
+
+        if (currentCountry) {
+          currentCountryOptions.push(currentCountry)
+        } else {
+          currentCountryOptions.push(initialCountry)
+        }
+      })
+    }
+
+    return currentCountryOptions
+  }, [filteredCountryAgregate])
+
+  const initialCityAgregate = useMemo(() => {
+    const cities = [];
+
+    initialCountryAgregate.forEach(initialCountry => {
+      const agregateCityRaw =
+        postings &&
+        postings.reduce((acc, { city, country }) => {
+          if (country === initialCountry.value) {
+            if (!acc[city]) {
+              acc[city] = 0
+            }
+          }
+
+          return acc
+        }, {})
+
+      const agregateCityRawObjectKeys = Object.keys(agregateCityRaw)
+
+      if (agregateCityRawObjectKeys && agregateCityRawObjectKeys.length) {
+        agregateCityRawObjectKeys.forEach(item => {
+          if (item !== 'null') {
+            cities.push({
+              value: item,
+              label: `${item} (${agregateCityRaw[item]})`,
+              count: agregateCityRaw[item],
+              continent: initialCountry.continent,
+              country: initialCountry.value,
+            });
+          }
+        })
+      }
+    });
+
+    return cities;
+  }, [postings, initialCountryAgregate]);
+
+  const filteredCityAgregate = useMemo(() => {
+    const cities = [];
+
+    initialCountryAgregate.forEach(initialCountry => {
+      const agregateCityRaw =
+        filteredPostings &&
+        filteredPostings.reduce((acc, { city, country }) => {
+          if (country === initialCountry.value) {
+            if (!acc[city]) {
+              acc[city] = 0
+            }
+
+            acc[city]++
+          }
+
+          return acc
+        }, {})
+
+      const agregateCityRawObjectKeys = Object.keys(agregateCityRaw)
+
+      if (agregateCityRawObjectKeys && agregateCityRawObjectKeys.length) {
+        agregateCityRawObjectKeys.forEach(item => {
+          if (item !== 'null') {
+            cities.push({
+              value: item,
+              label: `${item} (${agregateCityRaw[item]})`,
+              count: agregateCityRaw[item],
+              continent: initialCountry.continent,
+              country: initialCountry.value,
+            });
+          }
+        });
+      }
+    })
+
+    return cities;
+  }, [filteredPostings, initialContinentAgregate]);
+
+  const cityOptions = useMemo(() => {
+    const currentCityOptions = [];
+
+    if (initialCityAgregate.length) {
+      initialCityAgregate.forEach(initialCity => {
+        const currentCity = filteredCityAgregate.find(
+          filteredCity =>
+          filteredCity.value === initialCity.value &&
+            filteredCity.continent === initialCity.continent
+        )
+
+        if (currentCity) {
+          currentCityOptions.push(currentCity)
+        } else {
+          currentCityOptions.push(initialCity)
+        }
+      })
+    }
+
+    return currentCityOptions
+  }, [filteredCityAgregate]);
 
   const initialDepartamentAgregate = useMemo(() => {
     const agregateDepartamentRaw =
@@ -429,25 +625,57 @@ const JobSearch: FC = () => {
     return currentSeniorityOptions
   }, [filteredSeniorityAgregate])
 
-  const handleSelectLocation = (value: string) => {
-    let selectedLocationQueries = selectedQueryLocation
-      ? selectedQueryLocation.split(",")
+  const handleSelectContinent = (value: string) => {
+    let selectedContinentQueries = selectedQueryContinent
+      ? selectedQueryContinent.split(',')
       : []
 
-    if (selectedLocationQueries.includes(value)) {
-      selectedLocationQueries = selectedLocationQueries.filter(
-        loc => loc !== value
+    if (selectedContinentQueries.includes(value)) {
+      selectedContinentQueries = selectedContinentQueries.filter(
+        (item) => item !== value
       )
     } else {
-      selectedLocationQueries.push(value)
+      selectedContinentQueries.push(value)
     }
+    
+    setSelectedQueryContinent(selectedContinentQueries.join(','));
+  };
+  
+  const handleSelectCountry = (value: string) => {
+    let selectedCountryQueries = selectedQueryCountry
+      ? selectedQueryCountry.split(',')
+      : []
 
-    setSelectedQueryLocation(selectedLocationQueries.join(","))
-  }
+    if (selectedCountryQueries.includes(value)) {
+      selectedCountryQueries = selectedCountryQueries.filter(
+        (item) => item !== value
+      )
+    } else {
+      selectedCountryQueries.push(value)
+    }
+    
+    setSelectedQueryCountry(selectedCountryQueries.join(','));
+  };
+
+  const handleSelectCity = (value: string) => {
+    let selectedCityQueries = selectedQueryCity
+      ? selectedQueryCity.split(',')
+      : []
+
+    if (selectedCityQueries.includes(value)) {
+      selectedCityQueries = selectedCityQueries.filter(
+        (item) => item !== value
+      )
+    } else {
+      selectedCityQueries.push(value)
+    }
+    
+    setSelectedQueryCity(selectedCityQueries.join(','));
+  };
 
   const handleSelectDepartament = (value: string) => {
     let selectedDepartamentQueries = selectedQueryDepartaments
-      ? selectedQueryDepartaments.split(",")
+      ? selectedQueryDepartaments.split(',')
       : []
 
     if (selectedDepartamentQueries.includes(value)) {
@@ -458,12 +686,12 @@ const JobSearch: FC = () => {
       selectedDepartamentQueries.push(value)
     }
 
-    setSelectedQueryDepartaments(selectedDepartamentQueries.join(","))
+    setSelectedQueryDepartaments(selectedDepartamentQueries.join(','))
   }
 
   const handleSelectTeam = (value: string) => {
     let selectedTeamQueries = selectedQueryTeams
-      ? selectedQueryTeams.split(",")
+      ? selectedQueryTeams.split(',')
       : []
 
     if (selectedTeamQueries.includes(value)) {
@@ -472,12 +700,12 @@ const JobSearch: FC = () => {
       selectedTeamQueries.push(value)
     }
 
-    setSelectedQueryTeams(selectedTeamQueries.join(","))
+    setSelectedQueryTeams(selectedTeamQueries.join(','))
   }
 
   const handleSelectSeniority = (value: string) => {
     let selectedSeniorityQueries = selectedQuerySeniority
-      ? selectedQuerySeniority.split(",")
+      ? selectedQuerySeniority.split(',')
       : []
 
     if (selectedSeniorityQueries.includes(value)) {
@@ -488,7 +716,7 @@ const JobSearch: FC = () => {
       selectedSeniorityQueries.push(value)
     }
 
-    setSelectedQuerySeniority(selectedSeniorityQueries.join(","))
+    setSelectedQuerySeniority(selectedSeniorityQueries.join(','))
   }
 
   const onClickSearchButton = () => {
@@ -496,10 +724,12 @@ const JobSearch: FC = () => {
   }
 
   const handleClearFilters = () => {
-    setSelectedLocations([])
-    setSelectedDepartaments([])
-    setSelectedTeams([])
-    setSelectedSeniorities([])
+    setSelectedContinent([]);
+    setSelectedCountry([]);
+    setSelectedCity([]);
+    setSelectedDepartaments([]);
+    setSelectedTeams([]);
+    setSelectedSeniorities([]);
   }
 
   const onClickPlaceholder = () => {
@@ -520,10 +750,10 @@ const JobSearch: FC = () => {
       <div
         style={{
           backgroundImage:
-            "url(https://careers.vtex.com/wp-content/uploads/2020/10/bg_jobsearch.png)",
-          backgroundPosition: "center left",
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
+            'url(https://careers.vtex.com/wp-content/uploads/2020/10/bg_jobsearch.png)',
+          backgroundPosition: 'center left',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
           minHeight: 400,
         }}
         className="w-100 cover-container"
@@ -533,7 +763,7 @@ const JobSearch: FC = () => {
         </h2>
         <form
           onSubmit={event => event.preventDefault()}
-          style={{ width: "100%" }}
+          style={{ width: '100%' }}
         >
           <div className="search-query-wrapper">
             <input
@@ -546,7 +776,7 @@ const JobSearch: FC = () => {
             />
             <button
               className={`search-query-placeholder${
-                hidePlaceholder || query.length ? " hide" : ""
+                hidePlaceholder || query.length ? ' hide' : ''
               }`}
               type="button"
               onClick={onClickPlaceholder}
@@ -558,7 +788,7 @@ const JobSearch: FC = () => {
       </div>
       {/* Extract into Filters */}
       <div className="w-100 flex flex-col justify-center items-center -mt-9 text-center">
-        <div className="flex" style={{ width: "100%" }}>
+        <div className="flex" style={{ width: '100%' }}>
           <div className="w-100 filters-list-container">
             <button
               id="search-button"
@@ -576,13 +806,13 @@ const JobSearch: FC = () => {
             </button>
             <div
               id="filtering-options-modal"
-              className={`${filteringOptionsModal ? "show" : ""}`}
+              className={`${filteringOptionsModal ? 'show' : ''}`}
             >
               <div className="modal-content">
                 <h5 className="modal-title">Filtering options</h5>
                 <div
                   className={`search-job-filters locations-filters${
-                    showLocationsFilter ? " show" : ""
+                    showLocationsFilter ? ' show' : ''
                   }`}
                 >
                   <button
@@ -598,26 +828,56 @@ const JobSearch: FC = () => {
                     id="search-locations"
                     className="filters-list-content"
                   >
-                    {locationOptions
-                      .map(location => (
+                    {continentOptions.map(option => (
+                      <div key={option.label}>
                         <button
                           className={`category-button${
-                            selectedLocations.includes(location.value)
-                              ? " selected"
-                              : ""
-                          }
-                          ${location.count === 0 ? " disabled" : ""}`}
-                          onClick={() => handleSelectLocation(location.value)}
-                          key={location.label}
+                            selectedContinent.includes(option.value)
+                              ? '  selected'
+                              : ''
+                            }${option.count === 0 ? ' disabled' : ''}`}
+                          onClick={() => handleSelectContinent(option.value)}
                         >
-                          {location.label}
+                          {option.label}
                         </button>
-                      ))}
+                        {countryOptions
+                          .filter(item => item.continent === option.value)
+                          .map(jOption => (
+                            <div key={jOption.label}>
+                              <button
+                                className={`category-button subcategory-button${
+                                  selectedCountry.includes(jOption.value)
+                                    ? ' selected'
+                                    : ''
+                                  }${jOption.count === 0 ? ' disabled' : ''}`}
+                                onClick={() => handleSelectCountry(jOption.value)}
+                              >
+                                {jOption.label}
+                              </button>
+                              {cityOptions
+                                .filter(item => item.country === jOption.value)
+                                .map(kOption => (
+                                  <button
+                                    key={kOption.label}
+                                    className={`category-button subsubcategory-button${
+                                      selectedCity.includes(kOption.value)
+                                        ? ' selected'
+                                        : ''
+                                      }${kOption.count === 0 ? ' disabled' : ''}`}
+                                      onClick={() => handleSelectCity(kOption.value)}
+                                    >
+                                      {kOption.label}
+                                    </button>
+                                ))}
+                            </div>
+                          ))}
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div
                   className={`search-job-filters areas-of-work-filters${
-                    showDepartmentsFilter ? " show" : ""
+                    showDepartmentsFilter ? ' show' : ''
                   }`}
                 >
                   <button
@@ -640,10 +900,10 @@ const JobSearch: FC = () => {
                         <button
                           className={`category-button${
                             selectedDepartaments.includes(departament.value)
-                              ? " selected"
-                              : ""
+                              ? ' selected'
+                              : ''
                           }
-                              ${departament.count === 0 ? " disabled" : ""}`}
+                              ${departament.count === 0 ? ' disabled' : ''}`}
                           onClick={() =>
                             handleSelectDepartament(departament.value)
                           }
@@ -656,9 +916,9 @@ const JobSearch: FC = () => {
                             <button
                               className={`category-button subcategory-button${
                                 selectedTeams.includes(team.value)
-                                  ? " selected"
-                                  : ""
-                              }${team.count === 0 ? " disabled" : ""}`}
+                                  ? ' selected'
+                                  : ''
+                              }${team.count === 0 ? ' disabled' : ''}`}
                               onClick={() => handleSelectTeam(team.value)}
                               key={team.label}
                             >
@@ -671,7 +931,7 @@ const JobSearch: FC = () => {
                 </div>
                 <div
                   className={`search-job-filters seniority-level-filters${
-                    showSeniorityFilter ? " show" : ""
+                    showSeniorityFilter ? ' show' : ''
                   }`}
                 >
                   <button
@@ -691,10 +951,10 @@ const JobSearch: FC = () => {
                       <button
                         className={`category-button${
                           selectedSeniorities.includes(seniority.value)
-                            ? " selected"
-                            : ""
+                            ? ' selected'
+                            : ''
                         }
-                            ${seniority.count === 0 ? "disabled" : ""}`}
+                            ${seniority.count === 0 ? ' disabled' : ''}`}
                         onClick={() => handleSelectSeniority(seniority.value)}
                         key={seniority.label}
                       >
@@ -722,9 +982,11 @@ const JobSearch: FC = () => {
           </div>
         </div>
         <p id="main-count-feedback" className="pt-4 text-md text-black">
-          We have <span className="all">{filteredPostings.length}</span> jobs in{" "}
-          {Object.keys(filteredLocationAgregate).length} locations in{" "}
-          {Object.keys(filteredDepartamentAgregate).length} areas of work in{" "}
+          We have <span className="all">{filteredPostings.length}</span> jobs in{' '}
+          {Object.keys(filteredContinentAgregate).length +
+            Object.keys(filteredCountryAgregate).length +
+            Object.keys(filteredCityAgregate).length} locations in{' '}
+          {Object.keys(filteredDepartamentAgregate).length} areas of work in{' '}
           {Object.keys(filteredSeniorityAgregate).length} seniority levels
         </p>
       </div>

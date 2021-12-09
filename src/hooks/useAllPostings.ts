@@ -26,9 +26,11 @@ export const useAllPostings = () => {
   `)
   const postings = useMemo(() => {
     const allPostings = data?.allWpPosting?.nodes
+
     if (!allPostings) {
       return []
     }
+
     return (
       allPostings
         // For some reason, some posts come with no categories.
@@ -55,14 +57,30 @@ export const useAllPostings = () => {
               nodes[0]?.name?.includes(term)
             )?.name
           const seniority = findFieldByTerm("Seniorities")
-          const location = findFieldByTerm("Location")
+          const continent = categories?.nodes?.find((loc) => loc?.ancestors?.nodes?.length === 1 &&
+            loc?.ancestors?.nodes[0]?.name === 'Locations');
+          let country = null;
+          let city = null;
+
+          if (continent?.name?.length) {
+            country = categories?.nodes?.find((loc) => loc?.ancestors?.nodes?.length === 2 &&
+              loc?.ancestors?.nodes?.some((jLoc) => jLoc?.name === continent?.name));
+          }
+
+          if (country?.name?.length) {
+            city = categories?.nodes?.find((loc) => loc?.ancestors?.nodes?.length === 3 &&
+              loc?.ancestors?.nodes?.some((jLoc) => jLoc?.name === country?.name));
+          }
+
           return {
             title,
             slug,
             department,
             team,
             seniority,
-            location,
+            continent: continent?.name || null,
+            country: country?.name || null,
+            city: city?.name || null,
           } as Posting
         })
     )
