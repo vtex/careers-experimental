@@ -69,6 +69,13 @@ module.exports = {
         siteUrl: `https://careers.vtex.com`,
       },
     },
-    'gatsby-plugin-no-index'
+    'gatsby-plugin-no-index',
+    {
+      resolve: 'gatsby-plugin-google-tagmanager',
+      options: {
+        id: 'GTM-MKSCFKQ',
+        includeInDevelopment: true,
+      },
+    },
   ],
 }

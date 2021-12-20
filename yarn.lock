@@ -983,6 +983,13 @@
   dependencies:
     regenerator-runtime "^0.13.4"
 
+"@babel/runtime@^7.15.4":
+  version "7.16.5"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.16.5.tgz#7f3e34bf8bdbbadf03fbb7b1ea0d929569c9487a"
+  integrity sha512-TXWihFIS3Pyv5hzR7j6ihmeLkZfrXGxAr5UfSl8CHf+6q/wpiYDkUau0czckpYG8QmnCIuPpdLtuA9VmuGGyMA==
+  dependencies:
+    regenerator-runtime "^0.13.4"
+
 "@babel/standalone@^7.12.6":
   version "7.13.17"
   resolved "https://registry.yarnpkg.com/@babel/standalone/-/standalone-7.13.17.tgz#921b82a11a80ce824589516736d629efc53297aa"
@@ -6510,6 +6517,14 @@ gatsby-plugin-gatsby-cloud@^2.4.1:
     kebab-hash "^0.1.2"
     lodash "^4.17.21"
     webpack-assets-manifest "^5.0.1"
+
+gatsby-plugin-google-tagmanager@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/gatsby-plugin-google-tagmanager/-/gatsby-plugin-google-tagmanager-4.4.0.tgz#f3b7b8882bcd3995a4db3f587b7dac86083f1997"
+  integrity sha512-Yr8ySTlFwGr1/c+hf+2h6GyFXzT4JiR+VdF+f4qzCcVclywr7Gi0672TzMdNtNZY+X+bZ2UPP2mj8KVsd/Fd6w==
+  dependencies:
+    "@babel/runtime" "^7.15.4"
+    web-vitals "^1.1.2"
 
 gatsby-plugin-image@^1.5.0:
   version "1.5.0"
@@ -14095,6 +14110,11 @@ wcwidth@^1.0.1:
   integrity sha1-8LDc+RW8X/FSivrbLA4XtTLaL+g=
   dependencies:
     defaults "^1.0.3"
+
+web-vitals@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/web-vitals/-/web-vitals-1.1.2.tgz#06535308168986096239aa84716e68b4c6ae6d1c"
+  integrity sha512-PFMKIY+bRSXlMxVAQ+m2aw9c/ioUYfDgrYot0YUa+/xa0sakubWhSDyxAKwzymvXVdF4CZI71g06W+mqhzu6ig==
 
 webpack-assets-manifest@^5.0.1:
   version "5.0.6"
