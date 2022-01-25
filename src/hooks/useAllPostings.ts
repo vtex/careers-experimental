@@ -34,14 +34,14 @@ export const useAllPostings = () => {
     return (
       allPostings
         // For some reason, some posts come with no categories.
-        .filter(({ categories }) => categories?.nodes?.length > 1)
+        .filter(({ categories }) => categories?.nodes?.length > 0)
         .map(({ categories, ...posting }) => {
           // It trickly uses Wordpress's category taxony to figure out the field values for
           // each posting. It's ok since we do want WP to be our source of truth.
           const pair = categories.nodes
             .filter(
               ({ ancestors: { nodes } }) =>
-                nodes.length > 1 &&
+                nodes?.length > 0 &&
                 (nodes[0]?.name.includes("Department") ||
                   nodes[1]?.name.includes("Department"))
             )
