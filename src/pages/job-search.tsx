@@ -450,7 +450,7 @@ const JobSearch: FC = () => {
 
   const departamentOptions = useMemo(() => {
     const filteredCurrentAgregate = filteredDepartamentAgregate
-      ? Object.keys(filteredDepartamentAgregate).map(dept => ({
+      ? Object.keys(filteredDepartamentAgregate).map((dept) => ({
           value: dept,
           label: `${dept} (${filteredDepartamentAgregate[dept]})`,
           count: filteredDepartamentAgregate[dept],
@@ -492,6 +492,7 @@ const JobSearch: FC = () => {
         }, {})
 
       const agregateTeamRawObjectKeys = Object.keys(agregateTeamRaw)
+        .filter((t) => t !== 'null' && t !== 'undefined');
 
       if (agregateTeamRawObjectKeys && agregateTeamRawObjectKeys.length) {
         agregateTeamRawObjectKeys.forEach(t => {
@@ -547,7 +548,7 @@ const JobSearch: FC = () => {
     const currentTeamOptions = []
 
     if (initialTeamAgregate.length) {
-      initialTeamAgregate.forEach(initialTeam => {
+      initialTeamAgregate.forEach((initialTeam) => {
         const team = filteredTeamAgregate.find(
           filteredTeam =>
             filteredTeam.value === initialTeam.value &&
