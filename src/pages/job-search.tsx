@@ -11,9 +11,11 @@ import { useAllPostings } from '../hooks/useAllPostings';
 const JobSearch: FC = () => {
   const postings = useAllPostings();
   const inputRef = useRef(null);
-    const closeOnOutsideRef = useRef([]);
+  const closeOnOutsideRef = useRef([]);
   const filterButtons = useRef([]);
 
+  const [animationIndex, setAnimationIndex] = useState(0);
+  const [animationInterval, setAnimationInterval] = useState(null);
   const [filteredPostings, setFilteredPostings] = useState(postings);
   const [filteringOptionsModal, setFilteringOptionsModal] = useState(false);
   const [hidePlaceholder, setHidePlaceholder] = useState(false);
@@ -27,11 +29,11 @@ const JobSearch: FC = () => {
   const [showDepartmentsFilter, setShowDepartmentsFilter] = useState(false);
   const [showLocationsFilter, setShowLocationsFilter] = useState(false);
   const [showSeniorityFilter, setShowSeniorityFilter] = useState(false);
+  const [windowSize, setWindowSize] = useState({
+    height: undefined,
+    width: undefined,
+  });
 
-  const [selectedQueryLocation, setSelectedQueryLocation] = useQueryParam(
-    'locations',
-    StringParam,
-  );
   const [selectedQueryContinent, setSelectedQueryContinent] = useQueryParam(
     'continents',
     StringParam,
@@ -56,6 +58,48 @@ const JobSearch: FC = () => {
     'seniority',
     StringParam,
   );
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        height: window.innerHeight,
+        width: window.innerWidth,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    handleResize();
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const string = 'Write your next future here';
+    let index = 0;
+
+    if (hidePlaceholder || windowSize?.width < 1024) {
+      setAnimationInterval(null);
+      setAnimationIndex(0);
+      clearInterval(animationInterval)
+
+      return () => clearInterval(interval);
+    }
+
+    const interval = setInterval(() => {
+      setAnimationIndex((old) => {
+        if (old < string.length + 10) {
+          index += 1;
+        } else {
+          index = 0;
+        }
+  
+        return index;
+      });
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [hidePlaceholder, animationInterval, windowSize?.width]);
 
   useEffect(() => {
     if (selectedQueryContinent && selectedQueryContinent.length) {
@@ -734,8 +778,8 @@ const JobSearch: FC = () => {
   }
 
   const onClickPlaceholder = () => {
-    setHidePlaceholder(true)
-    inputRef.current.focus()
+    setHidePlaceholder(true);
+    inputRef.current.focus();
   }
 
   const onBlurSearchQuery = () => {
@@ -759,9 +803,7 @@ const JobSearch: FC = () => {
         }}
         className="w-100 cover-container"
       >
-        <h2 className="cover-title">
-          Explore our jobs and choose your next challenge.
-        </h2>
+        <h2 className="cover-title">Write your next future here</h2>
         <form
           onSubmit={event => event.preventDefault()}
           style={{ width: '100%' }}
@@ -782,7 +824,12 @@ const JobSearch: FC = () => {
               type="button"
               onClick={onClickPlaceholder}
             >
-              Write <span>here</span> your next future...
+              {windowSize?.width < 1024
+                ? 'Search for jobs'
+                : 'Write your next future here'.substring(0, animationIndex)}
+              {windowSize?.width >= 1024 ? (
+                <span className="placeholder-cursor" />
+              ) : null}
             </button>
           </div>
         </form>
