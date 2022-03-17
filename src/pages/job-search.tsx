@@ -101,8 +101,6 @@ const JobSearch: FC = () => {
     return () => clearInterval(interval);
   }, [hidePlaceholder, animationInterval, windowSize?.width]);
 
-  useEffect(() => { console.log('animationIndex', animationIndex)}, [animationIndex]);
-
   useEffect(() => {
     if (selectedQueryContinent && selectedQueryContinent.length) {
       setSelectedContinent(selectedQueryContinent.split(','));
